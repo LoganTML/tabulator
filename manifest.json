@@ -2,8 +2,8 @@
     "manifest_version": 3,
     "name": "Tabulator",
     "version": "1.0",
-    "description": "A tab cleanup extension",
-    "permissions": ["tabs", "storage", "activeTab", "declarativeContent", "scripting", "contextMenus"],
+    "description": "Group tabs by URL to reduce clutter and improve productivity and organization.",
+    "permissions": ["tabs"],
     "action": {
         "default_popup": "popup/popup.html",
         "default_icon": {

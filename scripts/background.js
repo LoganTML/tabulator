@@ -22,6 +22,7 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
         
                 // Loop through tab groups and take action based on the conditions
                 /*
+                used for testing- works
                 for (const curTabUrl in tabGroups) {
                     const curTabGroup = tabGroups[curTabUrl];
                     console.log("URL:", curTabUrl);
@@ -54,8 +55,8 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
                 function closeNewTabs() {
                     // Define the criteria for identifying "new tabs"
                     const criteria = {
-                        // You can use a URL pattern to identify new tabs. For example, "chrome://newtab" is the URL for a new tab page.
-                        url: "chrome://newtab/" // Change this URL pattern to match your definition of "new tabs"
+                        // Identify and delete new tabs
+                        url: "chrome://newtab/"
                     };
                     // IT WORKS!!!
                 
@@ -70,7 +71,7 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
                     });
                 }
 
-                // Call deleteNewTabs to start listening for window removal events
+                // Call closeNewTabs, defined above
                 closeNewTabs();
             });
         } /*else if (message.action === "deleteDuplicates") {
@@ -80,7 +81,7 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
                     chrome.scripting.executeScript({
                         target: { tabId: tab.id },
                         function: function () {
-                        // Implement duplicate tab deletion logic in the content script
+                        // Implement if needed
                         },
                     });
                 });
@@ -92,7 +93,7 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
 function groupTabsHelper() {
     console.log("Organizing tabs");
 
-    // Create a Promise to handle the asynchronous chrome.tabs.query() call
+    // Create a Promise to handle async chrome.tabs.query() call (otherwise it returns before query is complete)
     return new Promise((resolve) => {
         // Create an object to store tab groups
         const tabOrg = {};
@@ -102,16 +103,16 @@ function groupTabsHelper() {
             tabs.forEach(function (tab) {
                 const tabUrl = extractHostFromUrl(tab.url);
 
-                // Check if a group for this URL exists, if not, create one
+                // Check if a group for this URL exists. If not, create one
                 if (!tabOrg[tabUrl]) {
                     tabOrg[tabUrl] = [];
                 }
 
-                // Add the tab to the group
+                // Add tab to URL group
                 tabOrg[tabUrl].push(tab);
             });
 
-            // Move tabs with only one entry to "Unknown"
+            // Move tabs with only one entry to "Unknown", avoid creating any windows with only one tab
             for (const tabUrl in tabOrg) {
                 if (tabOrg[tabUrl].length === 1) {
                     const tabToMove = tabOrg[tabUrl][0];
@@ -129,7 +130,7 @@ function groupTabsHelper() {
     });
 }
 
-
+// Input: a URL string; returns the hostname without slashes or extensions
 function extractHostFromUrl(url) {
     try {
         const urlObject = new URL(url);
